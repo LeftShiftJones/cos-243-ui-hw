@@ -20,6 +20,30 @@ const server = Hapi.server({
     }
 });
 
+/**
+ * Helper function that checks the validity of an entered password
+ * @param {string} password password to check
+ * @param {list} message_list list to push relevant messages to
+ * @param {string} message message to be displayed
+ */
+function validate(password, message_list, message) {
+    if (!password.match(/[A-Z]/)) {
+        message_list.push(`${message} requires at least one upper-case letter`);
+    }
+
+    if (!password.match(/[a-z]/)) {
+        message_list.push(`${message} requires at least one lower-case letter`);
+    }
+
+    if (!password.match(/[0-9]/)) {
+        message_list.push(`${message} requires at least one digit`);
+    }
+
+    if (password.length < 8) {
+      message_list.push(`${message} must be at least 8 characters`);
+    }
+}
+
 async function init() {
     // Show routes at startup.
     await server.register(require('blipp'));
@@ -50,6 +74,7 @@ async function init() {
 
     // Configure static file service.
     await server.register(require('inert'));
+
 
     // Configure routes.
     server.route([
@@ -90,28 +115,22 @@ async function init() {
                 if (!request.payload.email.match(/^\w+@\w+\.\w{2,}$/)) {
                     messages.push(`'${request.payload.email}' is an invalid email address`);
                 }
-
-                if (!request.payload.password.match(/[A-Z]/)) {
-                    messages.push('Password requires at least one upper-case letter');
-                }
-
-                if (!request.payload.password.match(/[a-z]/)) {
-                    messages.push('Password requires at least one lower-case letter');
-                }
-
-                if (!request.payload.password.match(/[0-9]/)) {
-                    messages.push('Password requires at least one digit');
-                }
-
-                if (request.payload.password.length < 8) {
-                    messages.push('Password must be at least eight characters long');
-                }
-
+                validate(request.payload.password, messages, 'Sign-up password');
                 if (messages.length) {
                     return h.view('sign-up.hbs', {errors: messages})
                 } else {
                     return h.view('index', {flash: ['Signed up successfully!']});
                 }
+            }
+        },
+        {
+            method: 'GET',
+            path: '/reset-password',
+            config: {
+                description: 'Reset Password Page',
+            },
+            handler: async (request, h) => {
+                return h.view('reset-password.hbs');
             }
         },
         {
