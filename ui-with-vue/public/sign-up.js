@@ -71,6 +71,11 @@ let resetPassword = new Vue({
             validate(old_password, messages, 'Old Password');
             validate(new_password, messages, 'New Password');
             validate(pw_confirm, messages, 'Confirm Password');
+            if(messages.length) {
+                document.getElementsByTagName('input')[0].disabled = true;
+            } else {
+                document.getElementsByTagName('input')[0].disabled = false;
+            }
             return messages;
         }
     }
@@ -133,6 +138,11 @@ let signUp = new Vue({
             //         });
             //     }
             // }
+            if(messages.length) {
+                document.getElementsByTagName('input')[2].disabled = true;
+            } else {
+                document.getElementsByTagName('input')[2].disabled = false;
+            }
             return messages;
         }
     }
