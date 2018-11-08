@@ -1,4 +1,4 @@
-console.log("Loaded sign-up logic");
+console.log("Loaded reset logic");
 
 // Define components _before_ creating the Vue object.
 Vue.component('sign-up-static-heading', {
@@ -14,12 +14,6 @@ Vue.component('error-msge', {
     props: ['msge', 'severity'],
     template: `<div class="alert" v-bind:class="'alert-' + severity">{{ msge }}</div>`//define div class to show up
 });
-
-// Control...     If true   If false
-// ----------------------------------
-// Been visited   touched   untouched
-// Has changed	  dirty     pristine
-// Is valid       valid     invalid
 
 function validate(password, message_list, message) {
     if (!password.length) {
@@ -58,33 +52,35 @@ function validate(password, message_list, message) {
     }
 }
 
-
-// Create a new Vue object attached to the sign-up form.
-let signUp = new Vue({
-    el: '#sign-up-page',
+let resetPassword = new Vue({
+    el: '#reset-pw-page',
     data: {
-        email: '',
-        password: ''
+        old_password: '',
+        new_password: '',
+        pw_confirm: ''
     },
     computed: {
         errors: function () {
             let messages = [];
-            if (!this.email.length) {
-                messages.push({
+            validate(this.old_password, messages, 'Old Password');
+            validate(this.new_password, messages, 'New Password');
+            validate(this.pw_confirm, messages, 'Confirm Password');
+            if(this.old_password.length && (this.old_password == this.new_password)) {
+                messages.push ({
                     severity: 'danger',
-                    msge: 'Email must not be empty'
-                })
-            } else if (!this.email.match(/^\w+@\w+\.\w{2,}$/)) {
-                messages.push({
-                    severity: 'danger',
-                    msge: `'${this.email}' is an invalid email address`
+                    msge: 'New password must be different from old password'
                 });
             }
-            validate(this.password, messages, 'Password');
+            if(!(this.new_password == this.pw_confirm)) {
+                messages.push({
+                    severity: 'danger',
+                    msge: 'New passwords must match'
+                });
+            }
             if(messages.length) {
-                document.getElementsByTagName('input')[2].disabled = true;
+                document.getElementsByTagName('input')[3].disabled = true;
             } else {
-                document.getElementsByTagName('input')[2].disabled = false;
+                document.getElementsByTagName('input')[3].disabled = false;
             }
             return messages;
         }

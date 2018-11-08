@@ -134,6 +134,31 @@ async function init() {
             }
         },
         {
+            method: 'POST',
+            path: '/reset-password',
+            config: {
+                description: 'Handle reset request',
+                validate: {
+                    payload: {
+                        old_password: Joi.string().required(),
+                        new_password: Joi.string().required(),
+                        pw_confirm: Joi.string().required()
+                    }
+                }
+            },
+            handler: async(request, h) => {
+                let messages = [];
+                validate(request.payload.old_password, messages, 'Old Password');
+                validate(request.payload.new_password, messages, 'New Password');
+                validate(request.payload.pw_confirm, messages, 'Confirm Password');
+                if (messages.length) {
+                    return h.view('reset-password.hbs', { errors: messages })
+                } else {
+                    return h.view('index', { flash: ['Password reset successfully!'] });
+                }
+            }
+        },
+        {
             method: 'GET',
             path: '/public/{param*}',
             config: {
